@@ -1,0 +1,162 @@
+// Prisma Schema for Divya Drishti Astrology Platform
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  password        String
+  emailVerified   Boolean   @default(false)
+  twoFAEnabled    Boolean   @default(false)
+  twoFASecret     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  sessions        Session[]
+  kundlis         Kundli[]
+  tarotreadings   TarotReading[]
+  numerologies    Numerology[]
+  vastuanalyses   VastuAnalysis[]
+  rashifals       Rashifal[]
+  compatibilities Compatibility[]
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}
+
+model Kundli {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  personName        String    @default("Native")
+  dateOfBirth       DateTime
+  timeOfBirth       String
+  placeOfBirth      String
+  latitude          Float?
+  longitude         Float?
+  rashi             String
+  nakshatra         String
+  nakshatra_pada    Int       @default(1)
+  ascendant         String
+  sun               String
+  moon              String
+  mars              String
+  mercury           String
+  jupiter           String
+  venus             String
+  saturn            String
+  rahu              String
+  ketu              String
+  currentDasha      String
+  dashaStartDate    DateTime?
+  dashaEndDate      DateTime?
+  mangalDosha       Boolean   @default(false)
+  summary           String
+  fullReport        String    @db.Text
+  createdAt         DateTime  @default(now())
+}
+
+model TarotReading {
+  id              String    @id @default(cuid())
+  userId          String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spreadType      String    @default("THREE_CARD")
+  question        String?
+  cards           String[]
+  reversedCards   Boolean[]
+  interpretation  String    @db.Text
+  createdAt       DateTime  @default(now())
+}
+
+model Numerology {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName        String
+  dateOfBirth     DateTime
+  lifePathNum     Int
+  destinyNum      Int
+  soulUrgeNum     Int
+  personalityNum  Int
+  expressionNum   Int
+  lifePathDesc    String
+  destinyDesc     String
+  soulUrgeDesc    String
+  personalityDesc String
+  expressionDesc  String
+  luckyNumbers    Int[]
+  luckyColors     String[]
+  luckyDays       String[]
+  fullReport      String    @db.Text
+  createdAt       DateTime  @default(now())
+}
+
+model VastuAnalysis {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomType        String
+  direction       String?
+  colors          String[]
+  recommendations String[]
+  positiveAspects String[]
+  negativeAspects String[]
+  overallScore    Int
+  fullReport      String    @db.Text
+  createdAt       DateTime  @default(now())
+}
+
+model Rashifal {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rashi           String
+  predictionDate  DateTime  @default(now())
+  predictionType  String    @default("daily")
+  career          String    @db.Text
+  finance         String    @db.Text
+  health          String    @db.Text
+  relationships   String    @db.Text
+  personal        String    @db.Text
+  luckyColor      String
+  luckyNumber     Int
+  luckyDay        String
+  overallPred     String    @db.Text
+  createdAt       DateTime  @default(now())
+}
+
+model Compatibility {
+  id              String    @id @default(cuid())
+  person1Id       String
+  person1         User      @relation(fields: [person1Id], references: [id], onDelete: Cascade)
+  person1Name     String    @default("Person 1")
+  person2Name     String
+  person2DOB      DateTime
+  person2TOB      String?
+  person2POB      String?
+  varnaGuna       Float     @default(1.0)
+  vasyaGuna       Float     @default(2.0)
+  taraGuna        Float     @default(3.0)
+  yoniGuna        Float     @default(4.0)
+  grahaMaitri     Float     @default(5.0)
+  ganaGuna        Float     @default(6.0)
+  bhakutGuna      Float     @default(7.0)
+  nadiGuna        Float     @default(8.0)
+  totalScore      Int       @default(28)
+  compatibility   String    @default("Good")
+  prediction      String    @db.Text
+  createdAt       DateTime  @default(now())
+}
